@@ -449,6 +449,12 @@ public class PhotosetsInterface {
 		Photosets photosetsObject = new Photosets();
 		JSONObject photosetsElement = response.getData().getJSONObject(
 				"photosets");
+		
+		photosetsObject.setPage(photosetsElement.optInt("page"));
+		photosetsObject.setPages(photosetsElement.optInt("pages"));
+		photosetsObject.setPerPage(photosetsElement.optInt("perpage"));
+		photosetsObject.setTotal(photosetsElement.optInt("total"));
+		
 		List<Photoset> photosets = new ArrayList<Photoset>();
 		JSONArray photosetElements = photosetsElement.optJSONArray("photoset");
 		for (int i = 0; photosetElements != null
