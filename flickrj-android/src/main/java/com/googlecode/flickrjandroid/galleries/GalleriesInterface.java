@@ -15,10 +15,12 @@ import org.json.JSONObject;
 import com.googlecode.flickrjandroid.FlickrException;
 import com.googlecode.flickrjandroid.Parameter;
 import com.googlecode.flickrjandroid.Response;
+import com.googlecode.flickrjandroid.SearchResultList;
 import com.googlecode.flickrjandroid.Transport;
 import com.googlecode.flickrjandroid.oauth.OAuthInterface;
 import com.googlecode.flickrjandroid.oauth.OAuthUtils;
 import com.googlecode.flickrjandroid.photos.Extras;
+import com.googlecode.flickrjandroid.photos.Photo;
 import com.googlecode.flickrjandroid.photos.PhotoList;
 import com.googlecode.flickrjandroid.photos.PhotoUtils;
 import com.googlecode.flickrjandroid.util.JSONUtils;
@@ -114,7 +116,7 @@ public class GalleriesInterface {
      * @throws FlickrException
      * @throws JSONException 
      */
-    public List<Gallery> getList(String userId, int perPage, int page)
+    public SearchResultList<Gallery> getList(String userId, int perPage, int page)
             throws IOException, FlickrException, JSONException {
         List<Parameter> parameters = new ArrayList<Parameter>();
         parameters.add(new Parameter(KEY_METHOD, METHOD_GET_LIST));
@@ -128,13 +130,17 @@ public class GalleriesInterface {
             parameters.add(new Parameter(KEY_PAGE, String.valueOf(page)));
         }
 
-        List<Gallery> galleries = new ArrayList<Gallery>();
+        SearchResultList<Gallery> galleries = new SearchResultList<Gallery>();
         Response response = mTransport.get(mTransport.getPath(), parameters);
         if (response.isError()) {
             throw new FlickrException(response.getErrorCode(),
                     response.getErrorMessage());
-        }
+        }		
         JSONObject galleriesElement = response.getData().getJSONObject("galleries");
+        galleries.setPage(galleriesElement.getString("page"));
+        galleries.setPages(galleriesElement.getString("pages"));
+        galleries.setPerPage(galleriesElement.getString("per_page"));
+		galleries.setTotal(galleriesElement.getString("total"));
         JSONArray galleryNodes = galleriesElement
                 .optJSONArray("gallery"); //$NON-NLS-1$
         for (int i = 0; galleryNodes != null && i < galleryNodes.length(); i++) {
@@ -369,6 +375,30 @@ public class GalleriesInterface {
         gallery.setGalleryId(galleryElement.getString("id")); //$NON-NLS-1$
         gallery.setGalleryUrl(galleryElement.getString("url")); //$NON-NLS-1$
         gallery.setOwnerId(galleryElement.getString("owner")); //$NON-NLS-1$
+        Photo primaryPhoto = new Photo();
+		primaryPhoto.setId(galleryElement.getString("primary_photo_id"));
+		primaryPhoto.setSecret(galleryElement.optString("primary_photo_secret", null)); // TODO
+																			// verify
+																			// that
+																			// this
+																			// is
+																			// the
+																			// secret
+																			// for
+																			// the
+																			// photo
+		primaryPhoto.setServer(galleryElement.optString("primary_photo_server", null)); // TODO
+																			// verify
+																			// that
+																			// this
+																			// is
+																			// the
+																			// server
+																			// for
+																			// the
+																			// photo
+		primaryPhoto.setFarm(galleryElement.optString("primary_photo_farm", null));
+		gallery.setPrimaryPhoto(primaryPhoto);
         gallery.setPrimaryPhotoId(galleryElement.getString("primary_photo_id")); //$NON-NLS-1$
         gallery.setPhotoCount(galleryElement.optInt("count_photos")); //$NON-NLS-1$
         gallery.setVideoCount(galleryElement.optInt("count_videos")); //$NON-NLS-1$

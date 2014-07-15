@@ -5,6 +5,8 @@ package com.googlecode.flickrjandroid.galleries;
 
 import java.util.Date;
 
+import com.googlecode.flickrjandroid.photos.Photo;
+
 /**
  * Represents the flickr gallery.
  * 
@@ -15,6 +17,7 @@ public class Gallery {
     private String galleryUrl;
     private String ownerId;
     private String primaryPhotoId;
+    private Photo primaryPhoto;
     private int photoCount;
     private int videoCount;
     private int viewsCount;
@@ -63,6 +66,14 @@ public class Gallery {
         this.primaryPhotoId = primaryPhotoId;
     }
 
+    public Photo getPrimaryPhoto() {
+        return primaryPhoto;
+    }
+
+    public void setPrimaryPhoto(Photo primaryPhoto) {
+        this.primaryPhoto = primaryPhoto;
+    }
+    
     public int getPhotoCount() {
         return photoCount;
     }
